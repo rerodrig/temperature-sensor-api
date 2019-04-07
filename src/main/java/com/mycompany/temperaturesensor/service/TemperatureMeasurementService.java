@@ -7,6 +7,8 @@ import com.mycompany.temperaturesensor.service.model.mapper.TemperatureMeasureme
 import com.mycompany.temperaturesensor.service.model.mapper.TemperatureMeasurementModelToEntityMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -38,8 +40,12 @@ public class TemperatureMeasurementService {
 
     }
 
-    public Flux<TemperatureMeasurement> list() {
-        Flux<TemperatureMeasurementEntity> measurementEntityFlux = repository.findAll();
+    public Flux<TemperatureMeasurement> list(Integer pageNumber, Integer pageSize) {
+
+        Flux<TemperatureMeasurementEntity> measurementEntityFlux = repository.findAllByPage(
+                PageRequest.of(--pageNumber, pageSize, Sort.Direction.DESC, "measurementDateTime"));
+
         return measurementEntityFlux.map(TemperatureMeasurementEntityToModelMapper::map);
+
     }
 }

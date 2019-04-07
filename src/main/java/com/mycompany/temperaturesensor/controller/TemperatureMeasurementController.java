@@ -15,10 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -34,6 +36,7 @@ import java.util.UUID;
 @RequestMapping("/v1/temperature-measurements")
 @Api(value = "Temperature Measurement", tags = "V1-Temperature-Measurement")
 @Slf4j
+@CrossOrigin
 public class TemperatureMeasurementController {
 
     private final TemperatureMeasurementService temperatureMeasurementService;
@@ -47,9 +50,16 @@ public class TemperatureMeasurementController {
     @ApiOperation(value = "List all temperature measurements",
                   response = TemperatureMeasurementResponseDto.class,
                   responseContainer = "List")
-    public Flux<TemperatureMeasurementResponseDto> listTemperatureMeasurements() {
-        Flux<TemperatureMeasurement> temperatureMeasurementFlux = temperatureMeasurementService.list();
+    public Flux<TemperatureMeasurementResponseDto> listTemperatureMeasurements(
+            @ApiParam(value = "Page number") @RequestParam(name = "pageNumber", defaultValue = "1")
+                    int pageNumber,
+            @ApiParam(value = "Page size") @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
+
+        Flux<TemperatureMeasurement> temperatureMeasurementFlux = temperatureMeasurementService.list(pageNumber,
+                pageSize);
+
         return temperatureMeasurementFlux.map(TemperatureMeasurementModelToResponseDtoMapper::map);
+
     }
 
     @PostMapping

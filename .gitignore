@@ -29,6 +29,7 @@ hs_err_pid*
 # ide
 .idea/
 out/
+build/
 
 #project
 local/data
